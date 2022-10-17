@@ -1,13 +1,18 @@
 import React from "react";
 import ReactForceGraph2d from "react-force-graph-2d";
-import GraphEditor from "../components/GraphEditor";
-import KruskalOrPrimView from "../components/GraphTheoryAlgorithmView/KruskalOrPrimView";
+import KruskalOrPrimView from "../../components/GraphTheoryAlgorithmView/KruskalOrPrimView";
+import {
+  buildGraph,
+  DijkstraAlgorithm,
+  KruskalAlgorithm,
+  PrimAlgorithm,
+} from "../../graphTheory";
 import {
   DataForceGraph,
   LinkGraph,
   NodeGraph,
   ResAlgorithm,
-} from "../graphTheory/TypeGraph";
+} from "../../graphTheory/TypeGraph";
 
 const sizeReactForceGraph2d = 40;
 
@@ -19,8 +24,7 @@ function GraphTheory() {
     nodes: [],
     links: [],
   });
-  const [nodePrim, setNodePrim] = React.useState("");
-  const [errInputNodePrim, setErrInputNodePrim] = React.useState("");
+  const [start, setStart] = React.useState("");
 
   const [algorithmViewData, setAlgorithmViewData] =
     React.useState<ResAlgorithm>();
@@ -60,7 +64,6 @@ function GraphTheory() {
                   onChange={(e) => {}}
                   placeholder=""
                   spellCheck={false}
-                  // disabled={true}
                 />
                 <label className="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-sky-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] peer-focus:text-sky-500 before:border-slate-700 peer-focus:before:border-sky-500 dark:after:border-slate-700 peer-focus:after:border-sky-500">
                   Node count
@@ -90,7 +93,7 @@ function GraphTheory() {
                         if (
                           !links.find(
                             (link) =>
-                              link.source === val[0] && link.target === val[1],
+                              link.source === val[0] && link.target === val[1]
                           )
                         )
                           if (val[0] === val[1])
@@ -118,38 +121,72 @@ function GraphTheory() {
                 </label>
               </div>
               <div className="space-y-4">
-                <div className="flex space-x-2">
-                  <button
-                    className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
-                    onClick={() => {}}
-                  >
-                    KRUSKAL
-                  </button>
-                </div>
-                <div>
+                {directionless ? (
                   <div className="flex space-x-2">
                     <button
                       className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
                       onClick={() => {
-                        if (
-                          graphData.nodes.find((node) => node.id === nodePrim)
-                        ) {
-                        } else setErrInputNodePrim("Wrong input node");
+                        const graph = buildGraph(
+                          inputData.split("\n").map((l) => l.split(" "))
+                        );
+                        setAlgorithmViewData(KruskalAlgorithm(graph));
                       }}
                     >
-                      PRIM
+                      KRUSKAL
                     </button>
-                    <input
-                      className="border border-slate-900 rounded px-2 focus:outline-none"
-                      placeholder="Node"
-                      value={nodePrim}
-                      onChange={(e) => setNodePrim(e.target.value)}
-                    />
+                    <div className="flex-1 flex space-x-2">
+                      <button
+                        className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                        onClick={() => {
+                          if (
+                            graphData.nodes.find((node) => node.id === start)
+                          ) {
+                            const graph = buildGraph(
+                              inputData.split("\n").map((l) => l.split(" "))
+                            );
+                            setAlgorithmViewData(PrimAlgorithm(graph, start));
+                          } else {
+                          }
+                        }}
+                      >
+                        PRIM
+                      </button>
+                      <input
+                        className="w-full border border-slate-900 rounded px-2 focus:outline-none"
+                        placeholder="Start"
+                        value={start}
+                        onChange={(e) => setStart(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  {!!errInputNodePrim && (
-                    <p className="text-red-500">{errInputNodePrim}</p>
-                  )}
-                </div>
+                ) : (
+                  <>
+                    <div className="flex space-x-2">
+                      <button
+                        className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                        onClick={() => {
+                          if (
+                            graphData.nodes.find((node) => node.id === start)
+                          ) {
+                            const graph = buildGraph(
+                              inputData.split("\n").map((l) => l.split(" "))
+                            );
+                            const test = DijkstraAlgorithm(graph, start);
+                          } else {
+                          }
+                        }}
+                      >
+                        Dijkstra
+                      </button>
+                      <input
+                        className="w-full border border-slate-900 rounded px-2 focus:outline-none"
+                        placeholder="Start"
+                        value={start}
+                        onChange={(e) => setStart(e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
