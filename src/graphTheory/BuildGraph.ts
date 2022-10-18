@@ -1,7 +1,9 @@
 import { Graph, LinkGraph } from "./TypeGraph";
 
-export const buildGraph = (edges: string[][]): Graph => {
-  
+export const buildGraph = (
+  edges: string[][],
+  directionless: boolean = true
+): Graph => {
   /*
   graph = [
     [ "a", "b", "5" ]
@@ -34,16 +36,13 @@ export const buildGraph = (edges: string[][]): Graph => {
       if (!(a in graph)) graph[a] = [];
       if (!(b in graph)) graph[b] = [];
       graph[a].push({ node: b, weight: c || "1" });
-      graph[b].push({ node: a, weight: c || "1" });
+      if (directionless) graph[b].push({ node: a, weight: c || "1" });
     }
   }
-  return graph
+  return graph;
 };
 
-export const buildEdges = (
-  graph: Graph,
-  directionless: boolean = true,
-): LinkGraph[] => {
+export const buildEdges = (graph: Graph): LinkGraph[] => {
   /**
     graph =>
     edges = [
@@ -52,27 +51,13 @@ export const buildEdges = (
     ]
    */
   const edges: LinkGraph[] = [];
-  if (directionless) {
-    for (const node in graph) {
-      graph[node].forEach((p) => {
-        if (
-          !edges.find(
-            (edge) => edge.source === node && edge.target === p.node,
-          ) &&
-          !edges.find((edge) => edge.target === node && edge.source === p.node)
-        )
-          edges.push({ source: node, target: p.node, weight: p.weight || "1" });
-      });
-    }
-  } else {
-    for (const node in graph) {
-      graph[node].forEach((p) => {
-        if (
-          !edges.find((edge) => edge.source === node && edge.target === p.node)
-        )
-          edges.push({ source: node, target: p.node, weight: p.weight || "1" });
-      });
-    }
+
+  for (const node in graph) {
+    graph[node].forEach((p) => {
+      if (!edges.find((edge) => edge.source === node && edge.target === p.node))
+        edges.push({ source: node, target: p.node, weight: p.weight || "1" });
+    });
   }
+
   return edges;
 };

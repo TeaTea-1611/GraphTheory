@@ -1,6 +1,7 @@
 import React from "react";
 import ReactForceGraph2d from "react-force-graph-2d";
-import KruskalOrPrimView from "../../components/GraphTheoryAlgorithmView/KruskalOrPrimView";
+import ReactForceGraph3d from "react-force-graph-3d";
+import KruskalOrPrimView from "./KruskalOrPrimView";
 import {
   buildGraph,
   DijkstraAlgorithm,
@@ -13,6 +14,8 @@ import {
   NodeGraph,
   ResAlgorithm,
 } from "../../graphTheory/TypeGraph";
+import SpriteText from "three-spritetext";
+import DijkstraView from "./DijkstraView";
 
 const sizeReactForceGraph2d = 40;
 
@@ -24,7 +27,13 @@ function GraphTheory() {
     nodes: [],
     links: [],
   });
+  const [view3d, setView3d] = React.useState(false);
   const [start, setStart] = React.useState("");
+  const [end, setEnd] = React.useState("");
+  const [algorithm, setAlgorithm] = React.useState<
+    "kruskal" | "prim" | "dijkstra"
+  >("kruskal");
+  const [err, setErr] = React.useState("");
 
   const [algorithmViewData, setAlgorithmViewData] =
     React.useState<ResAlgorithm>();
@@ -43,6 +52,8 @@ function GraphTheory() {
     algorithmViewData?.algorithm === "kruskal"
   ) {
     ViewAlgorithm = <KruskalOrPrimView data={algorithmViewData} />;
+  } else if (algorithmViewData?.algorithm === "dijkstra") {
+    ViewAlgorithm = <DijkstraView data={algorithmViewData} />;
   }
 
   return (
@@ -72,7 +83,7 @@ function GraphTheory() {
               <div className="relative w-full">
                 <textarea
                   className="peer w-full focus:outline-none resize-none bg-transparent font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-sky-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-slate-700 placeholder-shown:border-t-slate-700 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-slate-700 focus:border-sky-500"
-                  rows={20}
+                  rows={15}
                   value={inputData}
                   onChange={(e) => {
                     setInputData(e.target.value);
@@ -121,73 +132,105 @@ function GraphTheory() {
                 </label>
               </div>
               <div className="space-y-4">
-                {directionless ? (
-                  <div className="flex space-x-2">
-                    <button
-                      className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
-                      onClick={() => {
-                        const graph = buildGraph(
-                          inputData.split("\n").map((l) => l.split(" "))
-                        );
-                        setAlgorithmViewData(KruskalAlgorithm(graph));
-                      }}
-                    >
-                      KRUSKAL
-                    </button>
-                    <div className="flex-1 flex space-x-2">
-                      <button
-                        className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
-                        onClick={() => {
-                          if (
-                            graphData.nodes.find((node) => node.id === start)
-                          ) {
-                            const graph = buildGraph(
-                              inputData.split("\n").map((l) => l.split(" "))
-                            );
-                            setAlgorithmViewData(PrimAlgorithm(graph, start));
-                          } else {
-                          }
-                        }}
-                      >
-                        PRIM
-                      </button>
-                      <input
-                        className="w-full border border-slate-900 rounded px-2 focus:outline-none"
-                        placeholder="Start"
-                        value={start}
-                        onChange={(e) => setStart(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex space-x-2">
-                      <button
-                        className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
-                        onClick={() => {
-                          if (
-                            graphData.nodes.find((node) => node.id === start)
-                          ) {
-                            const graph = buildGraph(
-                              inputData.split("\n").map((l) => l.split(" "))
-                            );
-                            const test = DijkstraAlgorithm(graph, start);
-                          } else {
-                          }
-                        }}
-                      >
-                        Dijkstra
-                      </button>
-                      <input
-                        className="w-full border border-slate-900 rounded px-2 focus:outline-none"
-                        placeholder="Start"
-                        value={start}
-                        onChange={(e) => setStart(e.target.value)}
-                      />
-                    </div>
-                  </>
-                )}
+                <div className="flex space-x-2">
+                  <input
+                    className="w-full py-1 border border-slate-900 rounded px-2 focus:outline-none"
+                    placeholder="Start"
+                    value={start}
+                    onChange={(e) => setStart(e.target.value)}
+                  />
+                  <input
+                    className="w-full py-1 border border-slate-900 rounded px-2 focus:outline-none"
+                    placeholder="End"
+                    value={end}
+                    onChange={(e) => setEnd(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    className={
+                      algorithm === "kruskal"
+                        ? "py-1 px-2 border border-slate-900 rounded bg-slate-900 text-white"
+                        : "py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                    }
+                    onClick={() => {
+                      setAlgorithm("kruskal");
+                      setDirectionless(true);
+                    }}
+                  >
+                    KRUSKAL
+                  </button>
+                  <button
+                    className={
+                      algorithm === "prim"
+                        ? "py-1 px-2 border border-slate-900 rounded bg-slate-900 text-white"
+                        : "py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                    }
+                    onClick={() => {
+                      setAlgorithm("prim");
+                      setDirectionless(true);
+                    }}
+                  >
+                    PRIM
+                  </button>
+                  <button
+                    className={
+                      algorithm === "dijkstra"
+                        ? "py-1 px-2 border border-slate-900 rounded bg-slate-900 text-white"
+                        : "py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                    }
+                    onClick={() => {
+                      setAlgorithm("dijkstra");
+                      setDirectionless(false);
+                    }}
+                  >
+                    DIJKSTRA
+                  </button>
+                </div>
+                <button
+                  className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white w-32 ml-auto"
+                  onClick={() => {
+                    if (
+                      graphData.nodes.find(
+                        (node) => node.id === start.trim()
+                      ) ||
+                      algorithm === "kruskal"
+                    ) {
+                      setErr("");
+                      let graph = buildGraph(
+                        inputData.split("\n").map((l) => l.split(" "))
+                      );
+                      switch (algorithm) {
+                        case "kruskal":
+                          setAlgorithmViewData(KruskalAlgorithm(graph));
+                          break;
+                        case "prim":
+                          setAlgorithmViewData(
+                            PrimAlgorithm(graph, start.trim())
+                          );
+
+                          break;
+                        case "dijkstra":
+                          graph = buildGraph(
+                            inputData.split("\n").map((l) => l.split(" ")),
+                            false
+                          );
+                          setAlgorithmViewData(
+                            DijkstraAlgorithm(graph, start.trim(), end.trim())
+                          );
+                          break;
+                        default:
+                          break;
+                      }
+                    } else {
+                      setErr("Vui lòng nhập đúng đỉnh");
+                    }
+                  }}
+                >
+                  Run
+                </button>
               </div>
+              {err && <p className="text-red-500 font-semibold">{err}</p>}
             </div>
           </div>
         </div>
@@ -213,46 +256,65 @@ function GraphTheory() {
                     Focus
                   </button>
                   <button
-                    className={
-                      directionless
-                        ? "py-1 px-2 border border-slate-900 rounded bg-slate-900 text-white"
-                        : "py-1 px-2 border border-slate-900 rounded"
-                    }
-                    onClick={() => {
-                      setDirectionless(!directionless);
-                    }}
+                    className="py-1 px-2 border border-slate-900 rounded hover:bg-slate-900 hover:text-white"
+                    onClick={() => setView3d(!view3d)}
                   >
-                    Directionless
+                    3D
                   </button>
                 </div>
-                <ReactForceGraph2d
-                  graphData={graphData}
-                  nodeRelSize={6}
-                  width={sizeReactForceGraph2d * 16}
-                  height={sizeReactForceGraph2d * 16}
-                  nodeLabel="name"
-                  linkCurvature="curvature"
-                  enablePointerInteraction={true}
-                  linkDirectionalParticleWidth={1}
-                  ref={forceRef}
-                  nodeCanvasObject={(node: any, ctx, globalScale) => {
-                    const label = node.name;
-                    const fontSize = 14 / globalScale;
-                    ctx.font = `${fontSize}px Sans-Serif`;
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillStyle = "white";
-                    ctx.fillText(label, node.x, node.y);
-                  }}
-                  nodeCanvasObjectMode={() => "after"}
-                  onNodeClick={(node) => {
-                    forceRef?.current?.zoom(3, 300);
-                    forceRef?.current?.centerAt(node.x, node.y, 300);
-                  }}
-                  linkWidth={2}
-                  linkDirectionalArrowLength={directionless ? 0 : 5}
-                  linkDirectionalArrowRelPos={1}
-                />
+                {!view3d ? (
+                  <ReactForceGraph2d
+                    graphData={graphData}
+                    nodeRelSize={6}
+                    width={sizeReactForceGraph2d * 16}
+                    height={sizeReactForceGraph2d * 16}
+                    nodeLabel="name"
+                    linkCurvature="curvature"
+                    enablePointerInteraction={true}
+                    linkDirectionalParticleWidth={1}
+                    ref={forceRef}
+                    nodeCanvasObject={(node: any, ctx, globalScale) => {
+                      const label = node.name;
+                      const fontSize = 14 / globalScale;
+                      ctx.font = `${fontSize}px Sans-Serif`;
+                      ctx.textAlign = "center";
+                      ctx.textBaseline = "middle";
+                      ctx.fillStyle = "white";
+                      ctx.fillText(label, node.x, node.y);
+                    }}
+                    nodeCanvasObjectMode={() => "after"}
+                    onNodeClick={(node) => {
+                      forceRef?.current?.zoom(3, 300);
+                      forceRef?.current?.centerAt(node.x, node.y, 300);
+                    }}
+                    linkWidth={2}
+                    linkDirectionalArrowLength={directionless ? 0 : 5}
+                    linkDirectionalArrowRelPos={1}
+                  />
+                ) : (
+                  <ReactForceGraph3d
+                    graphData={graphData}
+                    nodeRelSize={6}
+                    width={sizeReactForceGraph2d * 16}
+                    height={sizeReactForceGraph2d * 16}
+                    nodeLabel="name"
+                    linkCurvature="curvature"
+                    enablePointerInteraction={true}
+                    linkDirectionalParticleWidth={1}
+                    ref={forceRef}
+                    linkWidth={2}
+                    linkDirectionalArrowLength={directionless ? 0 : 5}
+                    linkDirectionalArrowRelPos={1}
+                    nodeAutoColorBy="group"
+                    nodeThreeObject={(node: any) => {
+                      const sprite = new SpriteText(node.name);
+                      sprite.color = node.color;
+                      sprite.textHeight = 8;
+                      sprite.padding = 2;
+                      return sprite;
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>

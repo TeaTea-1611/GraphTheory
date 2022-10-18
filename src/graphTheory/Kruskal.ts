@@ -44,7 +44,7 @@ const kruskalAlgorithm = (graph: Graph): ResAlgorithm => {
   let w = 0;
 
   const edges = buildEdges(graph).sort(
-    (a, b) => Number(a.weight) - Number(b.weight),
+    (a, b) => Number(a.weight) - Number(b.weight)
   );
 
   for (const edge of edges) {

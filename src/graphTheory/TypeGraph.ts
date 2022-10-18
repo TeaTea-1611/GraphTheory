@@ -19,10 +19,17 @@ export interface DataForceGraph {
   links: LinkGraph[];
 }
 
+export interface Path {
+  node: string;
+  distances: number;
+  path: string[];
+}
+
 export interface ResAlgorithm {
-  algorithm: "prim" | "kruskal";
+  algorithm: "prim" | "kruskal" | "dijkstra";
   success: boolean;
   message?: string;
   weight?: string;
   steps?: LinkGraph[];
+  paths?: Path[];
 }
