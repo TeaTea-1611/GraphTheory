@@ -7,20 +7,21 @@ function DijkstraView({ data }: { data: ResAlgorithm }) {
         <ul>
           {data?.paths &&
             data?.paths?.map((path: Path) => (
-              <li className="" key={path.node}>
-                <p>
-                  {`node ${path.node}: ${
+              <li className="space-x-1" key={path.node}>
+                <span className="font-medium">{`node ${path.node}: `}</span>
+                <span>
+                  {`${
                     !(path.distances >= Number.MAX_SAFE_INTEGER)
                       ? path.path.reduce(
                           (previousValue, currentValue, i) =>
                             i === 0
                               ? previousValue + currentValue
                               : previousValue + " -> " + currentValue,
-                          ""
+                          "",
                         ) + ` (${path.distances})`
-                      : "Không có đường đi"
+                      : "∞"
                   }`}
-                </p>
+                </span>
               </li>
             ))}
         </ul>

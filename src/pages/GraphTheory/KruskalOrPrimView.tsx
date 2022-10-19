@@ -17,16 +17,16 @@ function KruskalOrPrimView({ data }: { data: ResAlgorithm }) {
                 })}
               </ul>
               <div>
-                <p className="font-serif font-semibold">
+                <p className="font-semibold">
                   {`D = {`}
                   {data.steps?.reduce(
                     (previousValue, currentValue, i) =>
                       i === 0
                         ? previousValue +
-                          `{${currentValue?.source}, ${currentValue?.target}}`
+                          `(${currentValue?.source}, ${currentValue?.target})`
                         : previousValue +
-                          `, {${currentValue?.source}, ${currentValue.target}}`,
-                    ""
+                          `, (${currentValue?.source}, ${currentValue.target})`,
+                    "",
                   )}
                   {`} = ${data.weight}`}
                 </p>

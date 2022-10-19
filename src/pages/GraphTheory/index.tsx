@@ -39,8 +39,93 @@ function GraphTheory() {
     React.useState<ResAlgorithm>();
 
   const forceRef = React.useRef<any>(null);
+  const handleChangeInputData = (value: string) => {
+    setInputData(value);
+    const nodes: NodeGraph[] = [];
+    const links: LinkGraph[] = [];
+    const inputData = value.split("\n");
+    inputData.forEach((item) => {
+      const val = item.split(" ");
+
+      if (!!val[0])
+        if (!nodes.find((node) => node.id === val[0]))
+          nodes.push({ id: val[0], name: val[0] });
+      if (!!val[1])
+        if (!nodes.find((node) => node.id === val[1]))
+          nodes.push({ id: val[1], name: val[1] });
+
+      if (!!val[0] && !!val[1])
+        if (
+          !links.find(
+            (link) => link.source === val[0] && link.target === val[1],
+          )
+        )
+          if (val[0] === val[1])
+            links.push({
+              source: val[0],
+              target: val[1],
+              weight: val[2] || "1",
+              curvature: 0.6,
+            });
+          else
+            links.push({
+              source: val[0],
+              target: val[1],
+              weight: val[2] || "1",
+            });
+    });
+    setNodeCount(nodes.length);
+    setGraphData({
+      nodes,
+      links,
+    });
+  };
 
   React.useEffect(() => {
+    handleChangeInputData(`7 5 60
+9 8 31
+9 1 83
+4 3 25
+6 2 1
+4 1 52
+6 3 76
+7 6 95
+9 7 84
+8 2 91
+10 7 8
+6 4 32
+10 2 76
+3 1 62
+10 6 88
+8 3 12
+5 3 15
+5 4 40
+9 2 20
+3 2 5
+5 1 36
+9 4 98
+8 6 65
+8 5 95
+10 3 55
+9 6 95
+10 1 5
+4 2 70
+7 1 80
+10 4 35
+7 2 99
+10 9 24
+6 5 94
+2 1 77
+8 1 12
+8 4 76
+9 3 27
+5 2 5
+9 5 12
+10 5 1
+8 7 59
+6 1 1
+10 8 92
+7 3 54`);
     forceRef?.current?.d3Force("charge")?.strength(-150);
     forceRef?.current?.d3Force("link")?.distance(50);
     forceRef?.current?.d3Force("charge")?.distanceMax(150);
@@ -87,44 +172,7 @@ function GraphTheory() {
                     rows={15}
                     value={inputData}
                     onChange={(e) => {
-                      setInputData(e.target.value);
-                      const nodes: NodeGraph[] = [];
-                      const links: LinkGraph[] = [];
-                      const inputData = e.target.value.split("\n");
-                      inputData.forEach((item) => {
-                        const val = item.split(" ");
-
-                        if (!!val[0])
-                          if (!nodes.find((node) => node.id === val[0]))
-                            nodes.push({ id: val[0], name: val[0] });
-                        if (!!val[1])
-                          if (!nodes.find((node) => node.id === val[1]))
-                            nodes.push({ id: val[1], name: val[1] });
-
-                        if (!!val[0] && !!val[1])
-                          if (
-                            !links.find(
-                              (link) =>
-                                link.source === val[0] &&
-                                link.target === val[1],
-                            )
-                          )
-                            if (val[0] === val[1])
-                              links.push({
-                                source: val[0],
-                                target: val[1],
-                                weight: val[2] || "1",
-                                curvature: 0.6,
-                              });
-                            else
-                              links.push({
-                                source: val[0],
-                                target: val[1],
-                                weight: val[2] || "1",
-                              });
-                      });
-                      setNodeCount(nodes.length);
-                      setGraphData({ nodes, links });
+                      handleChangeInputData(e.target.value);
                     }}
                     placeholder=""
                     spellCheck={false}
@@ -230,7 +278,7 @@ function GraphTheory() {
                             break;
                         }
                       } else {
-                        setErr("Vui lòng nhập đúng đỉnh");
+                        setErr("wrong input node");
                       }
                     }}
                   >
