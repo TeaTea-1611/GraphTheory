@@ -15,12 +15,10 @@ const kruskalAlgorithm = (graph: Graph): ResAlgorithm => {
   const sz = new Array(nodes.length).fill(1);
 
   const find = (v: string): string => {
-    if (
-      nodes.findIndex((node) => node === v) ===
-      parents.findIndex((node) => node === v)
-    )
-      return v;
-    return parents[nodes.findIndex((node) => node === v)];
+    const iN = nodes.findIndex((node) => node === v);
+    const iP = parents.findIndex((node) => node === v);
+    if (iN === iP) return v;
+    return (parents[iP] = parents[iN]);
   };
 
   const union = (a: string, b: string) => {
@@ -44,7 +42,7 @@ const kruskalAlgorithm = (graph: Graph): ResAlgorithm => {
   let w = 0;
 
   const edges = buildEdges(graph).sort(
-    (a, b) => Number(a.weight) - Number(b.weight)
+    (a, b) => Number(a.weight) - Number(b.weight),
   );
 
   for (const edge of edges) {

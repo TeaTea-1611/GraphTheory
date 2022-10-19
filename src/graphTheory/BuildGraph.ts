@@ -2,7 +2,7 @@ import { Graph, LinkGraph } from "./TypeGraph";
 
 export const buildGraph = (
   edges: string[][],
-  directionless: boolean = true
+  directionless: boolean = true,
 ): Graph => {
   /*
   graph = [
@@ -17,16 +17,7 @@ export const buildGraph = (
   ]
   => 
   graph = {
-    a: [ { node: "b", weight: "1"}, "c" ]
-    ​b: [ "a", "c", "d" ]
-    ​c: [ "a", "b", "e" ]
-    ​d: [ "b", "e", "f" ]
-    ​e: [ "c", "d", "f" ]
-    ​f: [ "d", "e" ]
-    ​g: [ "h" ]
-    ​h: [ "g" ]
-    ​i: [ "k" ]
-    ​k: [ "i" ]
+    a: [ { node: "b", weight: "1"}, {...} ]
   }
   */
   const graph: Graph = {};
